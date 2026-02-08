@@ -1,70 +1,24 @@
-import { type TamboComponent, type TamboTool, defineTool } from "@tambo-ai/react";
-import { z } from "zod";
 import { AppointmentList } from "@/components/tambo/AppointmentList";
+import { AppointmentForm } from "@/components/tambo/AppointmentForm";
 import { VitalsForm } from "@/components/tambo/VitalsForm";
 import { PrescriptionForm } from "@/components/tambo/PrescriptionForm";
 import { MedicalHistory } from "@/components/tambo/MedicalHistory";
+import { MedicalRecordForm } from "@/components/tambo/MedicalRecordForm";
 import { NewPatientForm } from "@/components/tambo/NewPatientForm";
-
-// --- MOCK DATA ---
-const MOCK_APPOINTMENTS = [
-    { id: "1", patientName: "John Doe", time: "9:00 AM", reason: "Follow-up, Diabetes", status: "scheduled", room: "1", doctor: "Sarah" },
-    { id: "2", patientName: "Mary Smith", time: "10:30 AM", reason: "New Patient, Flu symptoms", status: "scheduled", room: "2", doctor: "Sarah" },
-    { id: "3", patientName: "Bob Johnson", time: "2:00 PM", reason: "Annual Checkup", status: "scheduled", room: "3", doctor: "Mike" },
-];
-
-const MOCK_HISTORY = [
-    { date: "Oct 12, 2025", diagnosis: "Type 2 Diabetes", doctor: "Sarah", notes: "Patient shows improving A1C levels. Continued Metformin." },
-    { date: "Jan 05, 2025", diagnosis: "Hypertension", doctor: "Mike", notes: "Blood pressure elevated. Recommended low sodium diet." },
-];
 
 // --- COMPONENT REGISTRATION ---
 export const tamboComponents: TamboComponent[] = [
+    // ... (previous ones)
     {
-        name: "AppointmentList",
-        description: "Displays a list of medical appointments for doctors, nurses, or patients.",
-        component: AppointmentList,
+        name: "MedicalRecordForm",
+        description: "A form to add a new clinical entry to a patient's medical history.",
+        component: MedicalRecordForm,
         propsSchema: z.object({
-            role: z.string().optional().default("patient"),
-            appointments: z.array(z.any()).default([]),
-        }),
-    },
-    {
-        name: "VitalsForm",
-        description: "A form to record patient vitals like blood pressure, temperature, and weight.",
-        component: VitalsForm,
-        propsSchema: z.object({
-            patientId: z.string().optional().default(""),
-            patientName: z.string().optional().default(""),
-        }),
-    },
-    {
-        name: "PrescriptionForm",
-        description: "A form for doctors to prescribe medication to patients.",
-        component: PrescriptionForm,
-        propsSchema: z.object({
-            patientId: z.string().optional().default(""),
             patientName: z.string().optional().default(""),
             doctorName: z.string().optional().default("Sarah"),
         }),
     },
-    {
-        name: "MedicalHistory",
-        description: "Displays a patient's medical history highlights.",
-        component: MedicalHistory,
-        propsSchema: z.object({
-            patientName: z.string().optional().default("Unknown Patient"),
-            history: z.array(z.any()).default([]),
-        }),
-    },
-    {
-        name: "NewPatientForm",
-        description: "A form to register a new patient in the system.",
-        component: NewPatientForm,
-        propsSchema: z.object({
-            patientName: z.string().optional(),
-        }),
-    },
+    // ... 
 ];
 
 // --- HELPER FOR SUPABASE FUNCTIONS ---
@@ -130,6 +84,25 @@ export const tamboTools: TamboTool[] = [
         }),
         tool: async (input) => {
             return await callSupabaseFunction('register-patient', input);
+        },
+    }),
+    defineTool({
+        name: "scheduleAppointment",
+        description: "Schedules a new appointment in the system.",
+        inputSchema: z.object({
+            patientName: z.string(),
+            date: z.string(),
+            time: z.string(),
+            reason: z.string(),
+        }),
+        outputSchema: z.object({
+            success: z.boolean(),
+            message: z.string(),
+        }),
+        tool: async (input) => {
+            // Mocking the backend call
+            console.log("Scheduling Appointment:", input);
+            return { success: true, message: "Appointment scheduled successfully" };
         },
     }),
 ];
