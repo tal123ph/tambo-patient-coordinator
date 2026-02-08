@@ -41,27 +41,47 @@ export function MedicalHistory({ patientName, history: rawHistory }: MedicalHist
                         </div>
                     </div>
                 ) : (
-                    history.filter(r => r !== null).map((record: any, idx: number) => (
-                        <div key={idx} className="p-6 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-slate-400" />
-                                    <span className="text-sm font-semibold text-slate-600 uppercase tracking-tighter">{record.date || 'N/A'}</span>
+                    <div className="divide-y divide-slate-100 p-2">
+                        {history.filter((r: any) => r !== null).map((record: any, idx: number) => (
+                            <div key={idx} className="p-6 hover:bg-slate-50/80 transition-all duration-300 group rounded-xl my-1 border border-transparent hover:border-emerald-100">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors">
+                                            <ClipboardList className="w-4 h-4 text-emerald-600" />
+                                        </div>
+                                        <h4 className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                                            {record.diagnosis}
+                                        </h4>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 bg-white border border-slate-100 px-3 py-1 rounded-full shadow-sm">
+                                        <Calendar className="w-3 h-3 text-emerald-500" /> {record.date}
+                                    </div>
                                 </div>
-                                <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-medium flex items-center gap-1.5">
-                                    <User className="w-3 h-3" /> Dr. {record.doctor || 'Unknown'}
-                                </span>
-                            </div>
 
-                            <h4 className="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
-                                <ClipboardList className="w-5 h-5 text-emerald-500" />
-                                {record.diagnosis || 'No Diagnosis Recorded'}
-                            </h4>
-                            <p className="text-slate-600 text-sm leading-relaxed bg-white p-3 rounded-lg border border-slate-100 shadow-sm mt-3 italic">
-                                "{record.notes || 'No notes available'}"
-                            </p>
-                        </div>
-                    ))
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs">
+                                            {record.doctor?.split(' ').map((n: string) => n[0]).join('')}
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">Attending Physician</p>
+                                            <p className="text-sm font-semibold text-slate-700">{record.doctor}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 relative overflow-hidden group-hover:bg-white transition-colors">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-50"></div>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400 mb-2 flex items-center gap-2">
+                                        <ClipboardList className="w-3 h-3" /> Clinical Notes
+                                    </p>
+                                    <p className="text-sm text-slate-600 leading-relaxed italic">
+                                        {record.notes}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 )}
             </div>
         </div>

@@ -20,9 +20,35 @@ const ROLES: Role[] = [
   { id: "patient", name: "John Doe", icon: User, color: "bg-orange-500", role: "patient" },
 ];
 
+const SUGGESTIONS = {
+  doctor: [
+    { label: "Check my schedule", prompt: "Show me my schedule for today" },
+    { label: "Medical history", prompt: "View medical history for John Doe" },
+    { label: "New prescription", prompt: "I need to write a new prescription" }
+  ],
+  nurse: [
+    { label: "Pending tasks", prompt: "Show me my pending tasks for today" },
+    { label: "Record vitals", prompt: "I need to record patient vitals" },
+    { label: "Add patient", prompt: "Register a new patient in the system" }
+  ],
+  patient: [
+    { label: "My appointments", prompt: "See my upcoming appointments" },
+    { label: "Medical advice", prompt: "I have a question about my medication" },
+    { label: "Talk to assistant", prompt: "Connect me with a health assistant" }
+  ]
+};
+
 function ChatInterface({ currentRole }: { currentRole: Role }) {
   const { thread } = useTamboThread();
   const { value, setValue, submit, isPending } = useTamboThreadInput();
+
+  const handleSuggestionClick = (prompt: string) => {
+    setValue(prompt);
+    // Use a small timeout to allow state to update before submit
+    setTimeout(() => submit(), 50);
+  };
+
+  const suggestions = SUGGESTIONS[currentRole.role] || [];
 
   return (
     <div className="flex flex-col h-full bg-slate-50 border-l border-slate-200 shadow-2xl">
@@ -48,9 +74,20 @@ function ChatInterface({ currentRole }: { currentRole: Role }) {
               <Bot className="w-8 h-8 text-blue-500" />
             </div>
             <h2 className="text-xl font-bold text-slate-800 mb-2">How can I help you, {currentRole.name}?</h2>
-            <p className="text-slate-500 text-sm max-w-xs mx-auto">
+            <p className="text-slate-500 text-sm max-w-xs mx-auto mb-8">
               Ask me about your schedule, patient records, or recording vitals.
             </p>
+            <div className="flex flex-wrap justify-center gap-2 max-w-sm mx-auto">
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSuggestionClick(s.prompt)}
+                  className="px-4 py-2 bg-white border border-slate-200 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {thread.messages.map((message) => {
@@ -89,6 +126,17 @@ function ChatInterface({ currentRole }: { currentRole: Role }) {
       </div>
 
       <div className="p-6 bg-white border-t border-slate-200">
+        <div className="flex flex-wrap gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+          {thread.messages.length > 0 && suggestions.map((s, i) => (
+            <button
+              key={i}
+              onClick={() => handleSuggestionClick(s.prompt)}
+              className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:bg-white hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm shrink-0"
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
         <form
           onSubmit={(e) => { e.preventDefault(); submit(); }}
           className="relative group"
